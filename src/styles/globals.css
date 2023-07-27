@@ -24,4 +24,23 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+
+  font-size: 64px;
+  font-family: chiaroscuro;
+  webkit-text-stroke: 1px black;
 }
+
+path {
+  animation: hideshow 1s ease-in-out infinite alternate;
+}
+/* 
+@keyframes hideshow {
+  from {
+    stroke-width: 0;
+    stroke: black;
+  }
+  to {
+    stroke-width: 8;
+    stroke: black;
+  }
+} */
