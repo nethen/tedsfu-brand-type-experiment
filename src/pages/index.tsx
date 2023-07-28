@@ -13,7 +13,7 @@ export default function Home() {
       <main>
         {/* <EmergeTextEffect>Test</EmergeTextEffect> */}
         <Logo />
-        <p>x: {pos.x}, y: {pos.y}</p>
+        <p className={`text-base ${inter.className}`}>x: {pos.x}, y: {pos.y}</p>
       </main>
   );
 }

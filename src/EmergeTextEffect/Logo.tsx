@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Inter } from "next/font/google";
+import { useMousePosition } from "@/contexts/useMousePosition";
+import { useBoundingBox } from "@/contexts/useBoundingBox";
+
+const inter = Inter({ subsets: ["latin"] });
 
 type Props = {};
 
@@ -9,35 +14,27 @@ const distSq = (x1: number, y1: number, x2: number, y2: number) => {
 const clamp = (num: number, min: number, max: number) =>
   Math.min(Math.max(num, min), max);
 
+
 const AnimatedPath = (props: any) => {
+  const mousePos = useMousePosition();
   const [progress, setProgress] = useState(0);
-  const pathRef = useRef<HTMLElement>();
+  // const pathRef = useRef<HTMLElement>();
+
+  const [pathRef, bounds] = useBoundingBox([]);
+  const origin = useMemo(()=> {
+    return {
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y + bounds.height / 2,
+    }
+  }, [bounds]);
 
   useEffect(() => {
     const maxDistSq = 70000;
-
-    const bounds = pathRef.current?.getBoundingClientRect() as DOMRect;
-    const origin = {
-      x: bounds.x + bounds.width / 2,
-      y: bounds.y + bounds.height / 2,
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const distanceSq = distSq(origin.x, origin.y, e.clientX, e.clientY);
-      // console.log(distanceSq / maxDistSq);
-      const clampedProgress = clamp(distanceSq / maxDistSq, 0, 1);
-      setProgress(clampedProgress);
-
-      // non-clamped process
-      // setProgress(distanceSq / maxDistSq);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [pathRef]);
+    const distanceSq = distSq(origin.x, origin.y, mousePos.x, mousePos.y);
+    if (props.logging == "true") console.log(distanceSq / maxDistSq);
+    const clampedProgress = clamp(distanceSq / maxDistSq, 0, 1);
+    setProgress(clampedProgress);
+  }, [origin, mousePos]);
 
   // reverse
   const strokeWidth = (1 - progress) * 2;
@@ -46,6 +43,7 @@ const AnimatedPath = (props: any) => {
   // const strokeWidth = (1 - (1 - progress)) * 2;
 
   return (
+
     <path
       ref={pathRef}
       strokeWidth={strokeWidth}
@@ -63,7 +61,9 @@ const AnimatedPath = (props: any) => {
 };
 
 const Logo = (props: Props) => {
+  const pos = useMousePosition();
   return (
+    <>
     <svg
       style={{
         marginTop: "2vh",
@@ -77,6 +77,7 @@ const Logo = (props: Props) => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <AnimatedPath
+        logging="true"
         d="M75.7257 17.1731C75.4885 10.4142 73.5913 1.87661 65.1723 1.52088L59.2434 1.28373V0.572266H77.03V65.9085L38.6109 107.292H0.903198V106.699C6.83208 106.699 12.6424 103.26 16.1997 85.8296L30.3104 16.6988C32.5634 3.5367 27.1089 1.04657 21.18 1.04657V0.572266H34.3421L17.8598 86.3039C13.7096 103.498 22.4843 104.091 26.3974 104.091H27.9389C39.4409 104.091 50.4686 91.047 56.9904 84.1695C73.7099 66.2643 76.3186 61.8769 76.3186 44.3274L75.7257 17.1731Z"
         fill="white"
       />
@@ -133,6 +134,8 @@ const Logo = (props: Props) => {
         fill="white"
       />
     </svg>
+    {/* <p className={`text-base ${inter.className}`}>x: {pos.x}, y: {pos.y}</p> */}
+    </>
   );
 };
 
