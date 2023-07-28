@@ -25,7 +25,7 @@ body {
     )
     rgb(var(--background-start-rgb));
 
-  font-size: 64px;
+  /* font-size: 64px; */
   font-family: chiaroscuro;
   webkit-text-stroke: 1px black;
 }
